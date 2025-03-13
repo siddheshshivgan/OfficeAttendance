@@ -68,7 +68,7 @@ const AttendanceForm = () => {
                     >
                         <MenuItem value="Pooja">Pooja</MenuItem>
                         <MenuItem value="Rahul">Rahul</MenuItem>
-                        <MenuItem value="Shailendra">Shailendra</MenuItem>
+                        <MenuItem value="Shailender">Shailender</MenuItem>
                         <MenuItem value="Shantaram">Shantaram</MenuItem>
                     </Select>
                 </FormControl>
