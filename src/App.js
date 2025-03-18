@@ -65,8 +65,7 @@ const App = () => {
               <AppBar position="static" elevation={0} style={{ backgroundColor: 'transparent' }}>
                   <Toolbar>
                       <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
-                          <img src={logoUrl} alt="Logo" style={{ width: '200px', height: 'auto', marginRight: '1rem' }} />
-                          <Typography variant="h6" component="div">Office Attendance</Typography>
+                          <img src={logoUrl} alt="Logo" style={{ width: '200px', height: 'auto', marginRight: '1rem' }} />                         
                       </Box>
                       {/* Apply Leave Button on the top right */}
                       <Box sx={{ display: 'flex', alignItems: 'center' }}> {/* Add this Box */}
