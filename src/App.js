@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom';
-import { Container, Button, AppBar, Toolbar, Typography, Box, CssBaseline } from '@mui/material';
+import { Container, Button, AppBar, Toolbar, Box, CssBaseline } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { gapi } from 'gapi-script';
 import AttendanceForm from './AttendanceForm';
