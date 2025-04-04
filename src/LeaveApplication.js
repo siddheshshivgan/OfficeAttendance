@@ -29,10 +29,8 @@ const LeaveApplication = () => {
             const startDate = field === 'startDate' ? value : leaveData.startDate;
             const endDate = field === 'endDate' ? value : leaveData.endDate;
 
-            if (startDate && endDate) {
-                if (!dayjs(endDate).isAfter(dayjs(startDate))) {
-                    newErrors.endDate = 'End date must be after start date';
-                }
+            if (startDate && endDate && dayjs(endDate).isBefore(dayjs(startDate))) {
+                newErrors.endDate = 'End date cannot be before start date';
             }
 
             setErrors(newErrors);
@@ -79,11 +77,9 @@ const LeaveApplication = () => {
             isValid = false;
         }
 
-        if (leaveData.startDate && leaveData.endDate) {
-            if (!dayjs(leaveData.endDate).isAfter(dayjs(leaveData.startDate))) {
-                newErrors.endDate = 'End date must be after start date';
-                isValid = false;
-            }
+        if (leaveData.startDate && leaveData.endDate && dayjs(leaveData.endDate).isBefore(dayjs(leaveData.startDate))) {
+            newErrors.endDate = 'End date cannot be before start date';
+            isValid = false;
         }
 
         setErrors(newErrors);
