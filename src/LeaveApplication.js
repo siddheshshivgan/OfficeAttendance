@@ -47,10 +47,9 @@ const LeaveApplication = () => {
     };
 
     const employeeList = [
-        { name: 'Pooja', email: process.env.REACT_APP_POOJA_EMAILID},
         { name: 'Rahul', email: process.env.REACT_APP_RAHUL_EMAILID},
         { name: 'Shailender', email: process.env.REACT_APP_SHAILENDER_EMAILID},
-        { name: 'Shantaram', email: process.env.REACT_APP_SHANTARAM_EMAILID},
+        { name: 'Rohit', email: process.env.REACT_APP_ROHIT_EMAILID},
     ];
 
     const validateForm = () => {

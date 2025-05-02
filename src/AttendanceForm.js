@@ -66,10 +66,9 @@ const AttendanceForm = () => {
                         onChange={(e) => setName(e.target.value)}
                         required
                     >
-                        <MenuItem value="Pooja">Pooja</MenuItem>
                         <MenuItem value="Rahul">Rahul</MenuItem>
                         <MenuItem value="Shailender">Shailender</MenuItem>
-                        <MenuItem value="Shantaram">Shantaram</MenuItem>
+                        <MenuItem value="Rohit">Rohit</MenuItem>
                     </Select>
                 </FormControl>
 
