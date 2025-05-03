@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { TextField, Button, Box, Typography, FormControl, InputLabel, Select, MenuItem, Dialog, DialogContent, DialogActions, FormHelperText } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -46,11 +46,11 @@ const LeaveApplication = ({ currentUser }) => {
         handleChange('email', selectedEmail);
     };
 
-    const employeeList = [
+    const employeeList =  useMemo(() => [
         { name: 'Rahul', email: process.env.REACT_APP_RAHUL_EMAILID},
         { name: 'Shailender', email: process.env.REACT_APP_SHAILENDER_EMAILID},
         { name: 'Rohit', email: process.env.REACT_APP_ROHIT_EMAILID},
-    ];
+    ], []);
 
     useEffect(() => {
         // Auto-select employee based on Google user's first name

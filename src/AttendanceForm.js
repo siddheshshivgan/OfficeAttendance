@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Typography, Button, Select, MenuItem, FormControl, InputLabel, Box, RadioGroup, FormControlLabel, Radio, Dialog, DialogContent, DialogActions } from '@mui/material';
 import { gapi } from 'gapi-script';
 
@@ -9,12 +9,11 @@ const AttendanceForm = ({ currentUser }) => {
     const [greeting, setGreeting] = useState('');
     
     // List of authorized employees
-    // eslint-disable-next-line
-    const employeeList = [
+    const employeeList = useMemo(() => [
         { name: 'Rahul'},
         { name: 'Shailender'},
         { name: 'Rohit'},
-    ];
+    ], []);
 
     const SPREADSHEET_ID = process.env.REACT_APP_ATTENDANCE_SPREADSHEET_ID;
     console.log("SPREADSHEET_ID:", process.env);
