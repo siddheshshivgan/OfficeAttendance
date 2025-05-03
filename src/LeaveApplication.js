@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextField, Button, Box, Typography, FormControl, InputLabel, Select, MenuItem, Dialog, DialogContent, DialogActions, FormHelperText } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/en-gb';
 import { gapi } from 'gapi-script';
 
-const LeaveApplication = () => {
+const LeaveApplication = ({ currentUser }) => {
     const [leaveData, setLeaveData] = useState({ startDate: null, endDate: null, type: '', reason: '', name: '', email: '' });
     const [openDialog, setOpenDialog] = useState(false);
     const [errors, setErrors] = useState({});
@@ -51,6 +51,23 @@ const LeaveApplication = () => {
         { name: 'Shailender', email: process.env.REACT_APP_SHAILENDER_EMAILID},
         { name: 'Rohit', email: process.env.REACT_APP_ROHIT_EMAILID},
     ];
+
+    useEffect(() => {
+        // Auto-select employee based on Google user's first name
+        if (currentUser && currentUser.firstName) {
+            const matchingEmployee = employeeList.find(
+                employee => employee.name.toLowerCase() === currentUser.firstName.toLowerCase()
+            );
+            
+            if (matchingEmployee) {
+                setLeaveData(prevData => ({
+                    ...prevData,
+                    name: matchingEmployee.name,
+                    email: matchingEmployee.email
+                }));
+            }
+        }
+    }, [currentUser, employeeList]);
 
     const validateForm = () => {
         let isValid = true;

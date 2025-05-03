@@ -2,11 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { Typography, Button, Select, MenuItem, FormControl, InputLabel, Box, RadioGroup, FormControlLabel, Radio, Dialog, DialogContent, DialogActions } from '@mui/material';
 import { gapi } from 'gapi-script';
 
-const AttendanceForm = () => {
+const AttendanceForm = ({ currentUser }) => {
     const [name, setName] = useState('');
     const [status, setStatus] = useState('Sign In');
     const [openDialog, setOpenDialog] = useState(false);
     const [greeting, setGreeting] = useState('');
+    
+    // List of authorized employees
+    const employeeList = [
+        { name: 'Rahul'},
+        { name: 'Shailender'},
+        { name: 'Rohit'},
+    ];
 
     const SPREADSHEET_ID = process.env.REACT_APP_ATTENDANCE_SPREADSHEET_ID;
     console.log("SPREADSHEET_ID:", process.env);
@@ -18,6 +25,24 @@ const AttendanceForm = () => {
         else if (hour < 18) setGreeting('Good Afternoon');
         else setGreeting('Good Evening');
     }, []);
+
+    useEffect(() => {
+        // Auto-select name from dropdown if Google user's first name matches
+        if (currentUser && currentUser.firstName) {
+            const matchingEmployee = employeeList.find(
+                employee => employee.name.toLowerCase() === currentUser.firstName.toLowerCase()
+            );
+            
+            if (matchingEmployee) {
+                setName(matchingEmployee.name);
+            } 
+        }
+    }, [currentUser, employeeList]);
+
+    const handleNameChange = (event) => {
+        const selectedName = event.target.value;
+        setName(selectedName);
+    };
 
     const handleSubmit = async (e) => {
         if (!gapi.client || !gapi.client.sheets) {
@@ -57,18 +82,19 @@ const AttendanceForm = () => {
             <Typography variant="h4" gutterBottom align="center">Office Attendance</Typography>
             <Typography variant="h8" gutterBottom align="center">{greeting}!</Typography>
             <form onSubmit={handleSubmit}>
-                {/* ... (Your existing attendance form code) ... */}
                 <FormControl fullWidth margin="normal">
                     <InputLabel>Name</InputLabel>
                     <Select
                         value={name}
                         label="Name"
-                        onChange={(e) => setName(e.target.value)}
+                        onChange={handleNameChange}
                         required
                     >
-                        <MenuItem value="Rahul">Rahul</MenuItem>
-                        <MenuItem value="Shailender">Shailender</MenuItem>
-                        <MenuItem value="Rohit">Rohit</MenuItem>
+                        {employeeList.map((employee) => (
+                            <MenuItem key={employee.name} value={employee.name}>
+                                {employee.name}
+                            </MenuItem>
+                        ))}
                     </Select>
                 </FormControl>
 

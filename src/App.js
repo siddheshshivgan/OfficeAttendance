@@ -11,6 +11,7 @@ const logoUrl = process.env.PUBLIC_URL + "/logo.png";
 const App = () => {
     const CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
     const API_KEY = process.env.REACT_APP_GOOGLE_API_KEY;
+    const [currentUser, setCurrentUser] = useState(null);
 
     // Initialize Google API when the component mounts
     useEffect(() => {
@@ -22,10 +23,10 @@ const App = () => {
               discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
             }).then(() => {
                 const authInstance = gapi.auth2.getAuthInstance();  // Get the auth instance
-    
+
                 authInstance.signIn().then((googleUser) => { 
                     if (googleUser) { // Check if googleUser is not null
-                        // User signed in successfully. Proceed with your logic.
+                        fetchUserProfile(googleUser);
                     } else {
                         // User closed the popup or sign-in failed. Handle it.
                         console.log("User did not sign in."); // Or display a message to the user.
@@ -42,6 +43,24 @@ const App = () => {
             }).catch((error) => { // Catch initialization errors
                 console.error("Google API initialization error:", error);
             });
+        };
+        
+        // Fetch user profile information
+        const fetchUserProfile = (googleUser) => {
+            // Get the user's basic profile information directly from the googleUser object
+            if (googleUser) {
+                const profile = googleUser.getBasicProfile();
+                if (profile) {
+                    setCurrentUser({
+                        firstName: profile.getGivenName(),
+                        email: profile.getEmail(),
+                        fullName: profile.getName()
+                    });
+                    console.log("User profile fetched:", profile.getName());
+                }
+            } else {
+                console.error("Google User object is null");
+            }
         };
     
         gapi.load('client:auth2', initClient);
@@ -76,8 +95,8 @@ const App = () => {
                   <Box sx={{ padding: '2rem', backgroundColor: 'background.paper', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
 
                       <Routes>
-                          <Route path="/OfficeAttendance" element={<AttendanceForm />} />
-                          <Route path="/leave" element={<LeaveApplication />} />
+                          <Route path="/OfficeAttendance" element={<AttendanceForm currentUser={currentUser} />} />
+                          <Route path="/leave" element={<LeaveApplication currentUser={currentUser} />} />
                           <Route path="/" element={<Navigate to="/OfficeAttendance" />} /> 
                       </Routes>
                   </Box>
