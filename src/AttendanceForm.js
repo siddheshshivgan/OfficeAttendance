@@ -9,6 +9,7 @@ const AttendanceForm = ({ currentUser }) => {
     const [greeting, setGreeting] = useState('');
     
     // List of authorized employees
+    // eslint-disable-next-line
     const employeeList = [
         { name: 'Rahul'},
         { name: 'Shailender'},
