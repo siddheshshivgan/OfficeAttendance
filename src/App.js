@@ -40,7 +40,7 @@ const App = () => {
                       window.location.reload();
                     }
                 });
-            }).catch((error) => { // Catch initialization errors
+            }).catch((error) => {
                 console.error("Google API initialization error:", error);
             });
         };
