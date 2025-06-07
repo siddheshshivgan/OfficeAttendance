@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { TextField, Button, Box, Typography, FormControl, InputLabel, Select, MenuItem, Dialog, DialogContent, DialogActions, FormHelperText } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -7,13 +7,16 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/en-gb';
 import { gapi } from 'gapi-script';
 
-const LeaveApplication = ({ currentUser }) => {
+const LeaveApplication = () => {
     const [leaveData, setLeaveData] = useState({ startDate: null, endDate: null, type: '', reason: '', name: '', email: '' });
     const [openDialog, setOpenDialog] = useState(false);
     const [errors, setErrors] = useState({});
+    const [remainingLeaves, setRemainingLeaves] = useState(null);
+
 
     const SPREADSHEET_ID = process.env.REACT_APP_LEAVE_SPREADSHEET_ID; // Use the same Spreadsheet ID from environment variables
     const LEAVE_RANGE = 'Sheet1!A2';
+    const COUNTER_RANGE = 'LeaveCounter!A2:D';
 
     const handleChange = (field, value) => {
         setLeaveData(prevData => ({ ...prevData, [field]: value }));
@@ -37,13 +40,33 @@ const LeaveApplication = ({ currentUser }) => {
         }
     };
 
-    const handleNameChange = (event) => {
+    const handleNameChange = async (event) => {
         const selectedName = event.target.value;
         handleChange('name', selectedName);
 
         const selectedEmployee = employeeList.find(employee => employee.name === selectedName);
         const selectedEmail = selectedEmployee?.email || '';
         handleChange('email', selectedEmail);
+
+        try {
+            const counterResponse = await gapi.client.sheets.spreadsheets.values.get({
+                spreadsheetId: SPREADSHEET_ID,
+                range: 'LeaveCounter!A2:D',
+            });
+
+            const rows = counterResponse.result.values || [];
+            const employeeRow = rows.find(row => row[0] === selectedName);
+
+            if (employeeRow) {
+                const remaining = parseInt(employeeRow[3], 10); // Column D = LeavesRemaining
+                setRemainingLeaves(remaining);
+            } else {
+                setRemainingLeaves(null);
+            }
+        } catch (error) {
+            console.error("Failed to fetch leave balance:", error);
+            setRemainingLeaves(null);
+        }
     };
 
     const employeeList =  useMemo(() => [
@@ -52,22 +75,26 @@ const LeaveApplication = ({ currentUser }) => {
         { name: 'Rohit', email: process.env.REACT_APP_ROHIT_EMAILID},
     ], []);
 
-    useEffect(() => {
-        // Auto-select employee based on Google user's first name
-        if (currentUser && currentUser.firstName) {
-            const matchingEmployee = employeeList.find(
-                employee => employee.name.toLowerCase() === currentUser.firstName.toLowerCase()
-            );
+    const calculateLeaveDays = (startDate, endDate) => {
+        return dayjs(endDate).diff(dayjs(startDate), 'day') + 1;
+    };
+
+    // useEffect(() => {
+    //     // Auto-select employee based on Google user's first name
+    //     if (currentUser && currentUser.firstName) {
+    //         const matchingEmployee = employeeList.find(
+    //             employee => employee.name.toLowerCase() === currentUser.firstName.toLowerCase()
+    //         );
             
-            if (matchingEmployee) {
-                setLeaveData(prevData => ({
-                    ...prevData,
-                    name: matchingEmployee.name,
-                    email: matchingEmployee.email
-                }));
-            }
-        }
-    }, [currentUser, employeeList]);
+    //         if (matchingEmployee) {
+    //             setLeaveData(prevData => ({
+    //                 ...prevData,
+    //                 name: matchingEmployee.name,
+    //                 email: matchingEmployee.email
+    //             }));
+    //         }
+    //     }
+    // }, [currentUser, employeeList]);
 
     const validateForm = () => {
         let isValid = true;
@@ -113,26 +140,56 @@ const LeaveApplication = ({ currentUser }) => {
         const formattedStartDate = leaveData.startDate ? leaveData.startDate.format('DD-MM-YYYY') : '';
         const formattedEndDate = leaveData.endDate ? leaveData.endDate.format('DD-MM-YYYY') : '';
         const appliedOn = new Date().toLocaleString('en-GB');
-
-        const values = [[leaveData.name, leaveData.type, formattedStartDate, formattedEndDate, leaveData.reason, leaveData.email, appliedOn]];
-        const body = { values };
+        const leaveDays = calculateLeaveDays(leaveData.startDate, leaveData.endDate);
 
         try {
-            const response = await gapi.client.sheets.spreadsheets.values.append({
+            const counterResponse = await gapi.client.sheets.spreadsheets.values.get({
+                spreadsheetId: SPREADSHEET_ID,
+                range: COUNTER_RANGE,
+            });
+
+            const rows = counterResponse.result.values || [];
+            const employeeIndex = rows.findIndex(row => row[0] === leaveData.name);
+
+            if (employeeIndex === -1) throw new Error("Employee not found in LeaveCounter sheet");
+
+            const row = rows[employeeIndex];
+            const totalLeaves = parseInt(row[1] || 8, 10); 
+            const currentLeavesTaken = parseInt(row[2] || 0, 10);
+            const currentLeavesRemaining = parseInt(row[3] || (totalLeaves - currentLeavesTaken), 10);
+            
+            if (leaveDays > currentLeavesRemaining) {
+                alert(`Insufficient leave balance. You have only ${currentLeavesRemaining} day(s) remaining.`);
+                return;
+            }
+            
+            const updatedLeavesTaken = currentLeavesTaken + leaveDays;
+            const updatedLeavesRemaining = currentLeavesRemaining - leaveDays;
+            const updateRange = `LeaveCounter!C${employeeIndex + 2}:D${employeeIndex + 2}`; // Adjusting for header row
+            await gapi.client.sheets.spreadsheets.values.update({
+                spreadsheetId: SPREADSHEET_ID,
+                range: updateRange,
+                valueInputOption: 'RAW',
+                resource: {
+                    values: [[updatedLeavesTaken, updatedLeavesRemaining]],
+                },
+            });
+
+            const values = [[leaveData.name, leaveData.type, formattedStartDate, formattedEndDate, leaveData.reason, leaveData.email, appliedOn, updatedLeavesRemaining]];
+            const body = { values };
+
+            // Append the leave application data to the Leave sheet
+            await gapi.client.sheets.spreadsheets.values.append({
                 spreadsheetId: SPREADSHEET_ID,
                 range: LEAVE_RANGE,
                 valueInputOption: 'RAW',
                 resource: body,
             });
-
-            if (response.status === 200) {
-                setOpenDialog(true);
-                setLeaveData({ startDate: null, endDate: null, type: '', reason: '', name: '' });
-                setErrors({});
-            } else {
-                console.error("Error updating Google Sheet:", response);
-                alert('Failed to update leave application. Please try again.');
-            }
+            
+            setOpenDialog(true);
+            setLeaveData({ startDate: null, endDate: null, type: '', reason: '', name: '', email: '' });
+            setErrors({});
+            setRemainingLeaves(null);
         } catch (error) {
             console.error("Error updating Google Sheet:", error);
             alert('An error occurred. Please try again later.');
@@ -162,6 +219,11 @@ const LeaveApplication = ({ currentUser }) => {
                             </MenuItem>
                         ))}
                     </Select>
+                    {remainingLeaves !== null && (
+                        <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
+                            Remaining Leave Balance: <strong>{remainingLeaves}</strong> day(s)
+                        </Typography>
+                    )}
                     {errors.name && <FormHelperText>{errors.name}</FormHelperText>}
                 </FormControl>
 
