@@ -158,10 +158,9 @@ const LeaveApplication = () => {
             const currentLeavesTaken = parseInt(row[2] || 0, 10);
             const currentLeavesRemaining = parseInt(row[3] || (totalLeaves - currentLeavesTaken), 10);
             
-            if (leaveDays > currentLeavesRemaining) {
-                alert(`Insufficient leave balance. You have only ${currentLeavesRemaining} day(s) remaining.`);
-                return;
-            }
+            if (leaveDays > currentLeavesRemaining) 
+                alert(`Insufficient leave balance. This leave will be considered unpaid and will be deducted from your salary.`);
+            
             
             const updatedLeavesTaken = currentLeavesTaken + leaveDays;
             const updatedLeavesRemaining = currentLeavesRemaining - leaveDays;
