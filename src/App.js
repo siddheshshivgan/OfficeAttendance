@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Container, Button, AppBar, Toolbar, Box, CssBaseline } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { gapi } from 'gapi-script';
@@ -7,6 +7,50 @@ import AttendanceForm from './AttendanceForm';
 import LeaveApplication from './LeaveApplication';
 
 const logoUrl = process.env.PUBLIC_URL + "/logo.png";
+
+// Move the AppBar and routing logic into a separate component to use hooks
+const AppContent = ({ currentUser }) => {
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    // Determine which page we're on
+    const isLeavePage = location.pathname === "/leave";
+
+    // Button label and navigation target
+    const buttonLabel = isLeavePage ? "Apply Attendance" : "Apply Leave";
+    const buttonTarget = isLeavePage ? "/OfficeAttendance" : "/leave";
+
+    return (
+        <>
+            <AppBar position="static" elevation={0} style={{ backgroundColor: 'transparent' }}>
+                <Toolbar>
+                    <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
+                        <img src={logoUrl} alt="Logo" style={{ width: '200px', height: 'auto', marginRight: '1rem' }} />
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => navigate(buttonTarget)}
+                        >
+                            {buttonLabel}
+                        </Button>
+                    </Box>
+                </Toolbar>
+            </AppBar>
+
+            <Container maxWidth="sm" style={{ marginTop: '2rem' }}>
+                <Box sx={{ padding: '2rem', backgroundColor: 'background.paper', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
+                    <Routes>
+                        <Route path="/OfficeAttendance" element={<AttendanceForm currentUser={currentUser} />} />
+                        <Route path="/leave" element={<LeaveApplication currentUser={currentUser} />} />
+                        <Route path="/" element={<Navigate to="/OfficeAttendance" />} />
+                    </Routes>
+                </Box>
+            </Container>
+        </>
+    );
+};
 
 const App = () => {
     const CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
@@ -79,28 +123,7 @@ const App = () => {
       <ThemeProvider theme={theme}>
           <CssBaseline />
           <BrowserRouter>
-              <AppBar position="static" elevation={0} style={{ backgroundColor: 'transparent' }}>
-                  <Toolbar>
-                      <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
-                          <img src={logoUrl} alt="Logo" style={{ width: '200px', height: 'auto', marginRight: '1rem' }} />                         
-                      </Box>
-                      {/* Apply Leave Button on the top right */}
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}> {/* Add this Box */}
-                        <Button component={Link} to="/leave" variant="contained" color="primary">Apply Leave</Button>
-                      </Box>
-                  </Toolbar>
-              </AppBar>
-
-              <Container maxWidth="sm" style={{ marginTop: '2rem' }}>
-                  <Box sx={{ padding: '2rem', backgroundColor: 'background.paper', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
-
-                      <Routes>
-                          <Route path="/OfficeAttendance" element={<AttendanceForm currentUser={currentUser} />} />
-                          <Route path="/leave" element={<LeaveApplication currentUser={currentUser} />} />
-                          <Route path="/" element={<Navigate to="/OfficeAttendance" />} /> 
-                      </Routes>
-                  </Box>
-              </Container>
+              <AppContent currentUser={currentUser} />
           </BrowserRouter>
       </ThemeProvider>
     );

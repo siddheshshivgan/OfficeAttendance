@@ -7,16 +7,16 @@ const AttendanceForm = ({ currentUser }) => {
     const [status, setStatus] = useState('Sign In');
     const [openDialog, setOpenDialog] = useState(false);
     const [greeting, setGreeting] = useState('');
+    const [alreadyMarked, setAlreadyMarked] = useState(false);
     
     // List of authorized employees
     const employeeList = useMemo(() => [
         { name: 'Rahul'},
-        { name: 'Shailender'},
-        { name: 'Rohit'},
+        { name: 'Namrata'},
+        // { name: 'Rohit'},
     ], []);
 
     const SPREADSHEET_ID = process.env.REACT_APP_ATTENDANCE_SPREADSHEET_ID;
-    console.log("SPREADSHEET_ID:", process.env);
     const ATTENDANCE_RANGE = 'Sheet1!A2'; // Adjust to your sheet and range
 
     useEffect(() => {
@@ -39,12 +39,40 @@ const AttendanceForm = ({ currentUser }) => {
         }
     }, [currentUser, employeeList]);
 
+    useEffect(() => {
+        const checkAttendance = async () => {
+            if (!name) return;
+            try {
+                const response = await gapi.client.sheets.spreadsheets.values.get({
+                    spreadsheetId: SPREADSHEET_ID,
+                    range: 'Sheet1!A2:C',
+                });
+                const rows = response.result.values || [];
+                const today = new Date().toLocaleDateString('en-GB');
+                console.log(rows)
+                const found = rows.some(row => 
+                    row[0] === name && 
+                    row[2] && row[2].split(',')[0].trim() === today
+                );
+                setAlreadyMarked(found);
+            } catch (error) {
+                console.error("Error checking attendance:", error);
+            }
+        };
+        checkAttendance();
+    }, [name, SPREADSHEET_ID, ATTENDANCE_RANGE]);
+
     const handleNameChange = (event) => {
         const selectedName = event.target.value;
         setName(selectedName);
     };
 
     const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (alreadyMarked) {
+            alert("Attendance already marked for today.");
+            return;
+        }
         if (!gapi.client || !gapi.client.sheets) {
             console.error("Google Sheets API is not initialized");
             return;
@@ -120,10 +148,21 @@ const AttendanceForm = ({ currentUser }) => {
                 </FormControl>
 
                 <Box textAlign="center" mt={3}>
-                    <Button type="submit" variant="contained" color="primary" size="large">
+                    <Button 
+                        type="submit" 
+                        variant="contained" 
+                        color="primary" 
+                        size="large"
+                        disabled={alreadyMarked}
+                    >
                         Submit Attendance
                     </Button>
                 </Box>
+                {alreadyMarked && (
+                    <Typography color="error" align="center" sx={{ mt: 2 }}>
+                        Attendance already marked for today.
+                    </Typography>
+                )}
             </form>
 
             <Dialog open={openDialog} onClose={handleCloseDialog}>

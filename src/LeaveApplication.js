@@ -71,8 +71,8 @@ const LeaveApplication = () => {
 
     const employeeList =  useMemo(() => [
         { name: 'Rahul', email: process.env.REACT_APP_RAHUL_EMAILID},
-        { name: 'Shailender', email: process.env.REACT_APP_SHAILENDER_EMAILID},
-        { name: 'Rohit', email: process.env.REACT_APP_ROHIT_EMAILID},
+        { name: 'Namrata', email: process.env.REACT_APP_NAMRATA_EMAILID},
+        // { name: 'Rohit', email: process.env.REACT_APP_ROHIT_EMAILID},
     ], []);
 
     const calculateLeaveDays = (startDate, endDate) => {
