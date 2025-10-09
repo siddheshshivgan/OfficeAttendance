@@ -30,8 +30,7 @@ jobs:
         echo "REACT_APP_ATTENDANCE_SPREADSHEET_ID=${{ secrets.REACT_APP_ATTENDANCE_SPREADSHEET_ID }}" >> .env
         echo "REACT_APP_LEAVE_SPREADSHEET_ID=${{ secrets.REACT_APP_LEAVE_SPREADSHEET_ID }}" >> .env
         echo "REACT_APP_RAHUL_EMAILID=${{ secrets.REACT_APP_RAHUL_EMAILID }}" >> .env
-        echo "REACT_APP_SHAILENDER_EMAILID=${{ secrets.REACT_APP_SHAILENDER_EMAILID }}" >> .env
-        echo "REACT_APP_ROHIT_EMAILID=${{ secrets.REACT_APP_ROHIT_EMAILID }}" >> .env
+        echo "REACT_APP_NAMRATA_EMAILID=${{ secrets.REACT_APP_NAMRATA_EMAILID }}" >> .env
         npm install
         npm run build
 
