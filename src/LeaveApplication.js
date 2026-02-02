@@ -165,16 +165,14 @@ const LeaveApplication = () => {
             const updatedLeavesTaken = currentLeavesTaken + leaveDays;
             const updatedLeavesRemaining = currentLeavesRemaining - leaveDays;
             const updateRange = `LeaveCounter!C${employeeIndex + 2}:D${employeeIndex + 2}`; // Adjusting for header row
-            // await gapi.client.sheets.spreadsheets.values.update({
-            //     spreadsheetId: SPREADSHEET_ID,
-            //     range: updateRange,
-            //     valueInputOption: 'RAW',
-            //     resource: {
-            //         values: [[updatedLeavesTaken, updatedLeavesRemaining]],
-            //     },
-            // });
-            console.log(leaveData); 
-            return; // Remove this line when ready to update the sheet
+            await gapi.client.sheets.spreadsheets.values.update({
+                spreadsheetId: SPREADSHEET_ID,
+                range: updateRange,
+                valueInputOption: 'RAW',
+                resource: {
+                    values: [[updatedLeavesTaken, updatedLeavesRemaining]],
+                },
+            });
 
             const values = [[leaveData.name, leaveData.type, formattedStartDate, formattedEndDate, leaveData.reason, leaveData.email, appliedOn, updatedLeavesRemaining]];
             const body = { values };
