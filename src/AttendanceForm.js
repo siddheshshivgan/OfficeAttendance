@@ -11,7 +11,7 @@ const AttendanceForm = ({ currentUser }) => {
     // List of authorized employees
     const employeeList = useMemo(() => [
         { name: 'Rahul'},
-        { name: 'Namrata'},
+        { name: 'Pooja'},
         { name: 'Rushali'},
     ], []);
 
