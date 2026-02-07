@@ -73,6 +73,7 @@ const LeaveApplication = () => {
         { name: 'Rahul', email: process.env.REACT_APP_RAHUL_EMAILID},
         { name: 'Pooja', email: process.env.REACT_APP_POOJA_EMAILID},
         { name: 'Rushali', email: process.env.REACT_APP_RUSHALI_EMAILID},
+        { name: 'Dinesh', email: process.env.REACT_APP_DINESH_EMAILID},
     ], []);
 
     const calculateLeaveDays = (startDate, endDate) => {

@@ -13,6 +13,7 @@ const AttendanceForm = ({ currentUser }) => {
         { name: 'Rahul'},
         { name: 'Pooja'},
         { name: 'Rushali'},
+        { name: 'Dinesh'},
     ], []);
 
     const SPREADSHEET_ID = process.env.REACT_APP_ATTENDANCE_SPREADSHEET_ID;
