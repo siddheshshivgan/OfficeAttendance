@@ -32,6 +32,7 @@ jobs:
         echo "REACT_APP_RAHUL_EMAILID=${{ secrets.REACT_APP_RAHUL_EMAILID }}" >> .env
         echo "REACT_APP_POOJA_EMAILID=${{ secrets.REACT_APP_POOJA_EMAILID }}" >> .env
         echo "REACT_APP_RUSHALI_EMAILID=${{ secrets.REACT_APP_RUSHALI_EMAILID }}" >> .env
+        echo "REACT_APP_DINESH_EMAILID=${{ secrets.REACT_APP_DINESH_EMAILID }}" >> .env
         npm install
         npm run build
 
