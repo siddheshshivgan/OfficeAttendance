@@ -77,7 +77,19 @@ const LeaveApplication = () => {
     ], []);
 
     const calculateLeaveDays = (startDate, endDate) => {
-        return dayjs(endDate).diff(dayjs(startDate), 'day') + 1;
+        let count = 0;
+        let current = dayjs(startDate);
+        const end = dayjs(endDate);
+
+        while (current.isBefore(end) || current.isSame(end, 'day')) {
+            const dayOfWeek = current.day(); // 0 = Sunday, 6 = Saturday
+            if (dayOfWeek !== 0) { // Exclude Sundays
+                count++;
+            }
+            current = current.add(1, 'day');
+        }
+
+        return count;
     };
 
     // useEffect(() => {
