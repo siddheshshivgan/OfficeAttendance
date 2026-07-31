@@ -73,7 +73,6 @@ const LeaveApplication = () => {
         { name: 'Rahul', email: process.env.REACT_APP_RAHUL_EMAILID},
         { name: 'Pooja', email: process.env.REACT_APP_POOJA_EMAILID},
         { name: 'Rushali', email: process.env.REACT_APP_RUSHALI_EMAILID},
-        { name: 'Dinesh', email: process.env.REACT_APP_DINESH_EMAILID},
     ], []);
 
     const calculateLeaveDays = (startDate, endDate) => {
@@ -187,7 +186,7 @@ const LeaveApplication = () => {
                 },
             });
 
-            const values = [[leaveData.name, leaveData.type, formattedStartDate, formattedEndDate, leaveData.reason, leaveData.email, appliedOn, updatedLeavesRemaining]];
+            const values = [[leaveData.name, leaveData.type, formattedStartDate, formattedEndDate, leaveData.reason, leaveData.email, appliedOn, updatedLeavesRemaining, leaveDays]];
             const body = { values };
 
             // Append the leave application data to the Leave sheet
